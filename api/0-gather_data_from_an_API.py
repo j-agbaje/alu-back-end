@@ -1,33 +1,29 @@
 #!/usr/bin/python3
+"""Module"""
 
 import requests
 import sys
 
 
-if __name__ == "__main__":
-    url = "https://jsonplaceholder.typicode.com/"
+"""Module"""
 
+if __name__ == '__main__':
+    user_id = sys.argv[1]
+    user_url = "https://jsonplaceholder.typicode.com/users/{}" \
+        .format(user_id)
+    todos_url = "https://jsonplaceholder.typicode.com/users/{}/todos/" \
+        .format(user_id)
 
-     employee_id = sys.argv[1]
+    user_info = requests.request('GET', user_url).json()
+    todos_info = requests.request('GET', todos_url).json()
 
-    user_response = requests.get(url + "users/{}".format(employee_id))
+    employee_name = user_info["name"]
+    task_completed = list(filter(lambda obj:
+                                 (obj["completed"] is True), todos_info))
+    number_of_done_tasks = len(task_completed)
+    total_number_of_tasks = len(todos_info)
 
-    user = user_response.json()
+    print("Employee {} is done with tasks({}/{}):".
+          format(employee_name, number_of_done_tasks, total_number_of_tasks))
 
-    parameter = {"userId": employee_id}
-
-    todos_response = requests.get(url + "todos", parameter=parameter)
-
-    todos = todos_response.json()
-
-    completed = []
-
-    for todo in todos:
-        if todo.get("completed") is True:
-            completed.append(todo.get("title"))
-
-    print("Employee {} is done with tasks({}/{})".format(user.get("name"). len(completed). len(todos)))
-
-    for complete in completed:
-        print("\t {}".format(complete))
-
+    [print("\t " + task["title"]) for task in task_completed]
